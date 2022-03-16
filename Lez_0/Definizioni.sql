@@ -209,6 +209,26 @@ where libro.editore_id = editore.id
 and libro.id = autore_libro.libro_id
 and autore.id = autore_libro.autore_id;
 
+select titolo, nome from libro, editore where libro.editore_id = editore.id;
+
+select titolo, prezzo, editore_id, editore.id, nome 
+from libro, editore
+where editore.id = libro.editore_id
+order by editore_id;
+
+-- Condizione di Join
+select titolo, nome, cognome
+from libro, autore, autore_libro
+where libro.id = autore_libro.libro_id
+and autore.id = autore_libro.autore_id;
+
+select titolo, prezzo, editore.nome, autore.nome, cognome
+from libro, editore, autore, autore_libro
+where libro.editore_id = editore.id
+and libro.id = autore_libro.libro_id
+and autore.id = autore_libro.autore_id
+and editore.nome = "Mondadori";
+
 -- ALIAS -- rietichettatura temporanea
 select 
     titolo Titolo, 
@@ -222,12 +242,58 @@ where l.editore_id = e.id
 and l.id = al.libro_id
 and a.id = al.autore_id;
 
-
-
 -- FOREIGN KEY --INTEGRITA' REFERENZIALE
 constraint fk_libro_editore
-    foreign key(editore_id) references editore(id)
+foreign key(editore_id) references editore(id)
+on delete cascade
+on update cascade;
+
+-- aggiungere foreign key
+alter table libro
+add constraint fk_libro_editore
+foreign key(editore_id) references editore(id)
+on delete no action
+on update cascade;
+
+-- cancellare
+delete from editore where id = 1;
+
+delete from editore where id = 10;
+
+delete from editore where id = 2;
+
+-- modificare dati
+update editore set id = 2 where id = 1;
+
+-- modificare foreign key
+alter table libro drop foreign key fk_libro_editore;
+
+alter table libro
+add constraint fk_libro_editore
+foreign key(editore_id) references editore(id)
+on delete cascade
+on update cascade;
 
 
+alter table libro drop foreign key fk_libro_editore;
 
+alter table libro
+add constraint fk_libro_editore
+foreign key(editore_id) references editore(id)
+on delete set null
+on update cascade;
 
+-- disabilitare temporaneamente la FK
+set foreign_key_checks = 0;
+--ripristinarle
+set foreign_key_checks = 1;
+
+-- Union -- tabella temporanea
+select nome, cognome from parente
+union
+select nome, cognome from amico where cognome like "v%"
+union 
+select nome, cognome from studente where genere = "f"
+order by cognome;
+
+-- JOIN
